@@ -1,0 +1,6 @@
+list,stat,sleep_records,minutes_asleep,time_in_bed
+1,Min,1.0,58.0,61.0
+2,1st Quarter,1.0,361.0,403.0
+3,Average,1.12,419.47,458.64
+4,3rd Quarter,1.0,490.0,526.0
+5,Max,3.0,796.0,961.0
