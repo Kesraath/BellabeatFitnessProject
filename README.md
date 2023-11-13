@@ -498,15 +498,16 @@ Note:
 
 There is a positive correlation between the number of steps taken and the number of calories burned which makes sense. The more activity in this case walking, or steps taken the more calories burned. This indicates that the data doesn't have any outliers.
 
-![alt text](https://github.com/Kesraath/BellabeatFitnessProject/blob/0d72fa5a41940a8dd509ba1d3268f23d332104dd/TotalSleep_vs_TotalTimeInBed.png?raw=true)
+![alt text](https://github.com/Kesraath/BellabeatFitnessProject/blob/BellabeatProjectFiles/TotalSleep_vs_TotalTimeInBed.pngraw=true)
 
 With regard to sleep, there is a linear correlation between the amount of time in bed and the amount of sleep one has. This suggests that if users wish to have more sleep, a notification to get in bed earlier could be helpful. 
 
+![alt text](https://github.com/Kesraath/BellabeatFitnessProject/blob/BellabeatProjectFiles/Sleep_vs_Sedentary_Time.png?raw=true)
+
+The graph above shows a trend that users who have more sedentary minutes in a day are more likely to have less sleep.
 
 ![alt text](https://github.com/Kesraath/BellabeatFitnessProject/blob/0d72fa5a41940a8dd509ba1d3268f23d332104dd/User%20Sleep%20Log%20Days.png?raw=true)
 
-
-Link to Tableau [HERE](https://public.tableau.com/views/FitbitDataViz3/UsersSleepLogDays?:language=en-US&:display_count=n&:origin=viz_share_link)
 
 The graphic above compares the days users logged their sleep.
 
@@ -514,9 +515,38 @@ As noted earlier, even with 24 participants, sleep was logged very occasionally.
 
 ### Recommendations for Bellabeat
 
+disclaimer/limitations:
+- As the data is from 2016, user usage may have changed not to mention the capability of devices in terms of holding charge and collecting data.
+- With only 33 participants, data can be biased towards this specific group of undisclosed participants. No user information was included, thus the following recommendation assumes that participants are equal in numbers of males and females.
+- This data exploration gives an idea of how users of a competing fitness tracker use their devices. With that, the recommendations will also assume that Bellabeat products are identical to the Fitbit devices or are competitive in features.
+
+##Target Audience
+
+Bellabeat is a brand that develops wearables and accompanying products that monitor biometric and lifestyle data to help women better understand how their bodies work and make healthier choices. With a mission to empower women to reconnect with themselves, unleash their inner strengths, and be what they were meant to be.
+
+As such the main target audience will be women who are less active (seen in the sedentary time) BUT want to improve their health, and do exercise but lightly to stay active.
+
+Although these women try to stay active, they may need a push in the right direction. 
+
+These can include:
+1. Increasing the average number of daily steps to that of at least 8000, with more being better.
+    - With 8000 steps daily, lowering the risk of mortality (by any cause) by 50% 
+2. Further, assist users in understanding the importance of sleep and help set sleep targets with notification reminders.
+    - From the available sleep logs, the more time users spend in bed the more they slept
+          - with the assumption that users who choose to wind down earlier are able to get more sleep
+3. Bellebeat can increase the users' awareness of exercise and amount of sleep or sleep quality by suggesting users reduce sedentary time.
+    - Keeping in mind, however, there is a possibility that the device did not register the sleep and instead recorded it as sedentary time.
+
+Outside of app-based changes, possible hardware recommendations are that Bellabeat:
+1. Increases the comfort so that users wear their devices to sleep
+2. Reduces the time it takes to charge the device
+3. Have a device that is able to run for multiple days
+
+These hardware change recommendations will need to work in conjunction with the software suggestion above, such as informing users about collecting sleep data and how they can use that to assist in their sleep habits.
 
 
-  
+Further analysis of specific data is required to have a full conclusion, as such using Bellabeat's own consented user data to corroborate the findings above will be the best way to correct for the limitation of a small sample size in the data from Fitbit.
 
+Thank you for reading my case study.
 
 
