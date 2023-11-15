@@ -3,23 +3,40 @@ Bellabeat Fitness Tracking Data Project
 
 ### Project Overview
 
-This data analysis project aims to provide fitness data insights for a fashionable health company that sells trackers designed and engineered for women, Bellabeat. By analysing various aspects of the daily use case of users, to find trends and make data-driven recommendations for new products or areas for targeted marketing. 
+This data analysis project aims to provide fitness data insights for a fashionable health company that sells trackers designed and engineered for women, Bellabeat. By analysing various aspects of the daily use case of fitness trackers by users, to find trends and make data-driven recommendations for new products or areas for targeted marketing. 
 
 ### Data Source
 [Kaggle Source Data](https://www.kaggle.com/datasets/arashnic/fitbit)
+The data sourced is personal tracker data, including minute level heart rate, physical activity and sleep monitoring from thirty consented Fitbit Users.
+The data were submitted by respondents through a distributed survey via Amazon Mechanical Turk. 
+The data is organised always by ID in Column A and timestamp in Column B with corresponding data in the following columns. 
+
+As this is user-submitted data from data that is collected via a smartwatch, it is difficult to fabricate the minute-level data that the trackers record. However, the method of collecting data has a monetary gain for those who opt to share their data, as such this is something to be considered when looking at the data. Further, the data is from a competing fitness tracking device, so data directly reflect the users currently using Bellabeat products.
+
+The Data was sourced between 12 March 2016 and 12 May 2016
+
+Data that will be used for the analysis:
 
 Fitness Tracking Data used for this project includes:
-"dailyActivity_merged.csv" This file contains detailed information regarding the amount of activity each user did in a day. This can be from nothing, sedentary, to high activity. 
+- The Name of each file was altered when entered into Bigquery Dataset for clarity. 
 
-"sleepDay_merged.csv" This file contains the sleep log for each user, including the number of times the device registered sleep, total minutes asleep, and total time in bed.
+"dailyActivity_merged.csv" contains detailed information regarding the amount of activity each user did in a day. This can be from nothing, sedentary, to high activity. 
 
-"weightLogInfo_merged.csv" This file contains the weight log for the participants, including their weight in both kilograms and pounds, BMI, and whether the reporting was manual. 
+"sleepDay_merged.csv" contains the sleep log for each user, including the number of times the device registered sleep, total minutes asleep, and total time in bed.
+
+"weightLogInfo_merged.csv" contains the weight log for the participants, including their weight in both kilograms and pounds, BMI, and whether the reporting was manual. 
+
+"dailyCalories_merged.csv" contains the day data was logged and the calories burned by a user (data also found in "dailyActicity_merged.csv")
+
+"dailySteps_merged.csv" contains the daily amount of steps and the day the activity was logged by a user (data also found in "dailyActicity_merged.csv")
 
 ### Tools
 
 - Google Sheets - Used to link to bigquery 
 - [Google Bigquery](https://cloud.google.com/bigquery) - Data Cleaning & Analysis
 - [Tableau](https://public.tableau.com/app/discover) - Visualisations
+
+I chose these tools as they were easy to integrate with one another. Loading the CSV files to Google Sheets via upload and then loading them into BigQuery using the connected sheets tool. In a scenario where changes or additional data were to be added to the spreadsheet, the BigQuery-connected file can be updated and be working on the latest updated spreadsheet. After which, generating/ saving the query output as a table in the BigQuery Dataset or new dataset for queried outputs, Tableau Desktop can be used to link directly to the output file from BigQeury using the connect to server method and logging into the Google account. This means that any changes anywhere in the pipeline can be seen quickly further down the chain. 
 
 ### Data Cleaning & Preparation
 
@@ -28,15 +45,24 @@ Fitness Tracking Data used for this project includes:
     - Each individual spreashsheet was relatively clean without missing values
 3. Data is loaded into Bigquery with connected sheets
 
+After scanning through the data in Google Sheets, there seemed to be no outliers or errors in the input of the data in the individual datasets. 
+Using filter by and count functions to check the number of logs, find null data, and check for IDs that don't have the exact number of characters.
+
+However, I did notice that some data sets had more logged data than others. From this, we can assume that not all participants recorded their data in every category. 
+
 ### Exploratory Data Analysis
 
-To get a better understanding of the participants and how many took data for each piece of data
+To get a better understanding of the participants and how many logged data for each data set
 
+I used the following query
 _____
 
 <details>
     <summary> SQL Query Finding the Quantity of Participants for Each Data Set </summary>
-    
+
+It creates a LogType for the name of the data set as column A and counts all distinct participant's ID. 
+This is then joined with the UNION ALL function as the data will be all joined in the same format as the first output for all the following datasets.
+
 ```sql
 SELECT 'Activity Log' AS LogType,
 COUNT(DISTINCT Id) AS Participants
@@ -79,7 +105,8 @@ Output:
 |Activity Log   |33          |
 
 
-This gives us an idea of how many participants are in each data set. 
+This gives us an idea of how many participants are in each data set. It shows clearly that only 8 users participated in the weight log. 
+Going back to look at the data set it shows that users had to manually input their weight and after some research, the Fitbit watches only track data if the user uses a certified scale or links their data to other software i.e. Apple health where the data will sync, but even this data will be shown as manually entered. 
 
 _____
 
@@ -237,7 +264,18 @@ To get a better idea of what's happening, statistical data is needed to see wher
 
 <details> 
     <summary> SQL Query for Stats Summary </summary>
-    <details>
+
+   
+The query below is a bit of a complicated mess, it calculates the Minimum, 1st Quartile, Average, 3rd Quartile, and Maximum of the logged data in each section of the Daily Activity Log.
+This likely could have been done with the following code in R
+
+``` R
+x <- read.csv("dailyActivity_merged.csv"
+summary(x)
+```
+However, this is the SQL code below to find stats and put them in a readable table format, using the same method as earlier using UNION ALL and labeling each corresponding 'stat' row with a string.
+    
+<details>
     <summary>Stats for Activity Log</summary>
 
 ``` sql
@@ -420,16 +458,15 @@ Output:
 
 From this summary, we can ascertain the following:
 - Among the participants, the average sedentary time is extremely high at 991 minutes (16 hours) daily
-- The average participant is lightly active as the time in light activity is the highest
+- The average participant is lightly active as the time in light activity is the highest amongst the activity categories (excluding sedentary)
 
-- Collating information from a [The Lancet](https://www.thelancet.com/journals/lanpub/article/PIIS2468-2667(21)00302-9/fulltext) study that sampled from over 47000 adults and 3000 deaths to provide evidence based guidelines on the daily amount of steps an adult should take. This includes potential health risks if not taken and The [National Insitutes Of Health's](https://www.nih.gov/news-events/nih-research-matters/number-steps-day-more-important-step-intensity) recommendation, benefits can be found at 8000 steps having 50% lower risk of dying as compared to those who averaged 4000 steps a day, and those with above 12,000 steps had a 65% lower risk of dying compared to averaging 4000 steps.
+- Collating information from a [The Lancet](https://www.thelancet.com/journals/lanpub/article/PIIS2468-2667(21)00302-9/fulltext) study that sampled from over 47000 adults and 3000 deaths to provide evidence-based guidelines on the daily amount of steps an adult should take. This includes potential health risks if not taken and The [National Insitutes Of Health's](https://www.nih.gov/news-events/nih-research-matters/number-steps-day-more-important-step-intensity) recommendation, benefits can be found at 8000 steps having 50% lower risk of dying as compared to those who averaged 4000 steps a day, and those with above 12,000 steps had a 65% lower risk of dying compared to averaging 4000 steps.
     - The participants are averaging about 7637 steps per day which is not significantly lower than the recommendation
 
 - The average sleep is about 7 hours daily with total time in bet at around 7 hours and 38 minutes
 
-- Lastly, that even when users did log their sleep data, it was an average of 17 days with only 3 users recording for a full 31 days.
+To confirm a suspicion, I used the following query to confirm he avg number of days logged by all user in the data sets
 
- Pulling Directly from the table we created
  ``` sql
 SELECT type,
 ROUND(AVG(days_logged)) AS average_days_logged,
@@ -443,11 +480,16 @@ GROUP BY type
 |Daily Step Log| 28.0              |
 |Calorie Log| 28.0              |
 
-With this, it is clear that the sleep data is missing a lot of data points compared to the other datasets even with 24 participants logging data.
+From this table, we see that even when users did log their sleep data, it was an average of 17 days with only 3 users recording for a full 31 days. It is reasonable to say that the sleep data is missing a lot of data points compared to the other datasets even with 24 participants logging data.
 
 ### Merging Data
 
+To merge the relevant data, we know that the "dailyActivity_merged.csv" dataset is the most full with all the users Id's as well as the most averagely logged. 
+
+Using the following SQL query below to create a new table with merged data using LEFT JOIN on the 'activity log' as the activity log is the most populated table that leaves null data from the Sleep and Weight Log where data was not collected. (The null data will be used later)
+
 ``` sql
+CREATE TABLE IF NOT EXISTS `project-1-396413.Fitbit.FitbitDataMerged` AS
 SELECT 
   daily_activity.Id,
   CAST(daily_activity.ActivityDate AS DATE) AS date,
@@ -482,41 +524,56 @@ LEFT JOIN `project-1-396413.Fitbit.sleep_day` AS sleep_day ON
 LEFT JOIN `project-1-396413.Fitbit.weight_log` AS weight_log ON
   daily_activity.Id = weight_log.Id AND daily_activity.ActivityDate = weight_log.Date
 ```
-Merging data using LEFT JOIN on the 'activity log' as the activity log is the most populated table that leaves null data from the Sleep and Weight Log where data was not collected.
+This query outputs the file "FitbitDataMerged.csv" when the dataset is downloaded
 
 ### Visualisation
 
-[Tableau Public Link](null) <--- add link
+[Tableau Public Link](https://public.tableau.com/app/profile/kes.andrew.raath/viz/FitbitFitnessTrackingDataViz_16998663196860/TotalStepsvsCalories)
 Click the above to view the visualisations in full
 
-Note: 
+The following CSV's were used: 
 - Using "sleepDay_merged.csv" for sleep data and the calendar viz
 - Using the "FitbitDataMerged.csv" for Sleep vs Total Time in Bed and Total Steps vs Calories Vizzes
 
+To confirm the data is making sense, more activity, in this case, steps lead to more calories burned. 
 
 ![alt text](https://github.com/Kesraath/BellabeatFitnessProject/blob/0d72fa5a41940a8dd509ba1d3268f23d332104dd/TotalSteps_vs_Calories.png?raw=true)
 
-There is a positive correlation between the number of steps taken and the number of calories burned which makes sense. The more activity in this case walking, or steps taken the more calories burned. This indicates that the data doesn't have any outliers.
+From the table above we see that there is a positive correlation between the number of steps taken and the number of calories burned. The more activity in this case walking, or steps taken the more calories burned.
+
+________
+
+To learn more about the habits of users in a visual way by comparing how the amount of time in bed relates to the amount of sleep one has.
 
 ![alt text](https://github.com/Kesraath/BellabeatFitnessProject/blob/BellabeatProjectFiles/TotalSleep_vs_TotalTimeInBed.pngraw=true)
 
-With regard to sleep, there is a linear correlation between the amount of time in bed and the amount of sleep one has. This suggests that if users wish to have more sleep, a notification to get in bed earlier could be helpful. 
+We can see there is a linear correlation between the amount of time in bed and the amount of sleep one has. This suggests that users who are in bed longer sleep more. 
+A notification to get in bed earlier could be helpful here.
+
+_________
+
+Looking for other aspects of a user's day that could be affecting their sleep I looked at how the lack of movement, sedentary time, affects one's ability to sleep.
 
 ![alt text](https://github.com/Kesraath/BellabeatFitnessProject/blob/BellabeatProjectFiles/Sleep_vs_Sedentary_Time.png?raw=true)
 
-The graph above shows a trend that users who have more sedentary minutes in a day are more likely to have less sleep.
+The graph above shows a trend that users who have more sedentary minutes in a day are more likely to have less sleep. 
+
+This is possibly from unused energy making users less tired at the end of a day, suggesting users move more, go for a walk, or exercise may help with this. However further data may be needed to confirm that more exercise leads to better sleep. 
+
+__________
+
+To visualise better the users who do log their sleep vs those who don't across the days of the data. This gives a clear understanding of how often users are logging their data, on which days as well as how many days consecutively or not at all.
 
 ![alt text](https://github.com/Kesraath/BellabeatFitnessProject/blob/0d72fa5a41940a8dd509ba1d3268f23d332104dd/User%20Sleep%20Log%20Days.png?raw=true)
 
+This used the "sleepDay_merged.csv" and does not include users who didn't log sleep data.
 
-The graphic above compares the days users logged their sleep.
-
-As noted earlier, even with 24 participants, sleep was logged very occasionally. This can suggest that participants aren't wearing their devices to sleep, the device requires charging as it was used throughout the day, or the participants didn't consider logging their sleep data.
+As noted earlier, even with 24 participants, sleep was logged very occasionally. This could suggest that participants aren't wearing their devices to sleep, the device requires charging as it was used throughout the day, or the participants didn't consider logging their sleep data.
 
 ### Recommendations for Bellabeat
 
 disclaimer/limitations:
-- As the data is from 2016, user usage may have changed not to mention the capability of devices in terms of holding charge and collecting data.
+- As the data is from 2016, user usage may have changed not to mention the capability of devices may have changed completely.
 - With only 33 participants, data can be biased towards this specific group of undisclosed participants. No user information was included, thus the following recommendation assumes that participants are equal in numbers of males and females.
 - This data exploration gives an idea of how users of a competing fitness tracker use their devices. With that, the recommendations will also assume that Bellabeat products are identical to the Fitbit devices or are competitive in features.
 
@@ -534,13 +591,18 @@ These can include:
 2. Further, assist users in understanding the importance of sleep and help set sleep targets with notification reminders.
     - From the available sleep logs, the more time users spend in bed the more they slept
           - with the assumption that users who choose to wind down earlier are able to get more sleep
-3. Bellebeat can increase the users' awareness of exercise and amount of sleep or sleep quality by suggesting users reduce sedentary time.
+3. Bellebeat can increase the users' awareness of exercise and the amount of sleep or sleep quality by suggesting users reduce sedentary time.
     - Keeping in mind, however, there is a possibility that the device did not register the sleep and instead recorded it as sedentary time.
+4. Create an easier method to sync or record weight data
+    - As seen by the lack of participants, Bellabeat could cater to this area by integrating weight tracking better.
+    - Create banners on the first start-up of the app after download or awareness if not already connected that users should allow Bellabeat to access other Health app data to allow for weight tracking.
+      -    Note that a disclaimer to users on the data collected and how it will be used/protected. 
 
 Outside of app-based changes, possible hardware recommendations are that Bellabeat:
 1. Increases the comfort so that users wear their devices to sleep
 2. Reduces the time it takes to charge the device
 3. Have a device that is able to run for multiple days
+4. Bundle in a scale for users as part of a promotion to promote a better understanding of one's weight and how to use it to get fit. 
 
 These hardware change recommendations will need to work in conjunction with the software suggestion above, such as informing users about collecting sleep data and how they can use that to assist in their sleep habits.
 
@@ -548,5 +610,4 @@ These hardware change recommendations will need to work in conjunction with the 
 Further analysis of specific data is required to have a full conclusion, as such using Bellabeat's own consented user data to corroborate the findings above will be the best way to correct for the limitation of a small sample size in the data from Fitbit.
 
 Thank you for reading my case study.
-
 
