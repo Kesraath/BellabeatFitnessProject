@@ -121,7 +121,7 @@ To further ensure the data is adequate we can check to see how often each user l
     <summary>SQL Query Logged Data by User </summary>
 
 - The query first declares that unqId (unique Id) is in a string format
-- Next create a table if one doesn't exist of a combination of all days logged by each user across all data sets except the weight log data, as it lacks participants, counting the unique dates of logged data grouped by the participants' Id. This creates long data
+- Next create a table if one doesn't exist of a combination of all days logged by each user across all data sets except the weight log data, as it lacks participants, counting the unique dates of logged data grouped by the participants' Id. This creates long data as seen below.
 
 Output LIMIT 5
 |Id        |type     |days_logged|
@@ -132,6 +132,7 @@ Output LIMIT 5
 |6775888955|Sleep Log|3          |
 |1844505072|Sleep Log|3          |
 
+- After this pivot, the created table with column names iterated through the 'unqId' assigned string this was then pivoted with the column names using a dynamic iteration process declared unqId (unique Id) at the beginning of the query with the rows being the days logged with column A being the type of Activity. To fix any data type issues CAST function is used to convert Id from INT64 to STR. 
 
 ```sql
 DECLARE unqId STRING;
@@ -198,70 +199,12 @@ Output
 |Daily Steps Log|31        |26        |31        |26        |31        |30        |4         |31        |31        |31        |18        |29        |28        |19        |20        |31        |31        |31        |31        |30        |31        |31        |31        |30        |29        |31        |31        |31        |31        |31        |31        |31        |31        |
 |Calorie Log    |31        |26        |31        |26        |31        |30        |4         |31        |31        |31        |18        |29        |28        |19        |20        |31        |31        |31        |31        |30        |31        |31        |31        |30        |29        |31        |31        |31        |31        |31        |31        |31        |31        |
 
-This gives us a better understanding of how the data was logged by each user. We can see the users who didn't log data where the data is empty.
+This gives us a better understanding of how the data was logged by each user. We can see the users who didn't log data where the data is empty. 
+We see that several although they did participate in logging their sleep data did not log every single day. With 6 participants logging less than 5 days. This will be kept in mind going forward. 
 
-<details> 
-    <summary>SQL Query Logs by Participant and Data Set</summary>
-Long data of each user was created using the create table if not exists query, this was then pivoted using dynamic iteration through declared unqId (unique Id) at the beginning of the query. To fix any data type issues CAST function is used to convert Id from INT64 to STR.
+__________
 
-``` sql
-DECLARE unqId STRING;
-
-CREATE TABLE IF NOT EXISTS `project-1-396413.Fitbit.days_logged` AS (
-
-SELECT Id, 'Activity Log' AS type, 
-COUNT(DISTINCT ActivityDate) AS days_logged
-FROM `project-1-396413.Fitbit.daily_activity`
-
-WHERE Id IS NOT NULL
-GROUP BY Id
-
-UNION ALL 
-
-SELECT Id, 'Calorie Log' AS type,
-COUNT(DISTINCT ActivityDay) AS days_logged
-FROM `project-1-396413.Fitbit.daily_calories`
-
-WHERE Id IS NOT NULL
-GROUP BY Id
-
-UNION ALL 
-
-SELECT Id, 'Daily Steps Log' AS type,
-COUNT(DISTINCT ActivityDay) AS days_logged
-FROM `project-1-396413.Fitbit.daily_steps`
-
-WHERE Id IS NOT NULL
-GROUP BY Id
-
-UNION ALL 
-
-SELECT Id, 'Sleep Log' AS type,
-COUNT(DISTINCT SleepDay) AS days_logged
-FROM `project-1-396413.Fitbit.sleep_day`
-
-WHERE Id IS NOT NULL
-GROUP BY Id
-);
-
-EXECUTE IMMEDIATE """
-  SELECT 
-STRING_AGG(CONCAT("'",CAST(Id AS STRING),"'")) 
-
-FROM (
-  SELECT
-  DISTINCT Id
-  FROM `project-1-396413.Fitbit.days_logged`
-) """ INTO unqId;
-
-EXECUTE IMMEDIATE FORMAT("""
-SELECT *
-FROM `project-1-396413.Fitbit.days_logged`
-PIVOT(SUM(days_logged) FOR CAST(Id AS STRING) IN(%s))""", unqId);
-```
-</details>
-
-To get a better idea of what's happening, statistical data is needed to see where the averages and 1st/3rd quartile data are sitting. 
+To get a general understanding of how users sit in terms of activity and sleep levels, statistical data is needed to see where the averages and 1st/3rd quartile data are sitting. 
 
 <details> 
     <summary> SQL Query for Stats Summary </summary>
@@ -466,7 +409,7 @@ From this summary, we can ascertain the following:
 
 - The average sleep is about 7 hours daily with total time in bet at around 7 hours and 38 minutes
 
-To confirm a suspicion, I used the following query to confirm he avg number of days logged by all user in the data sets
+and to confirm the average number of days sleep was logged, I used the following query:
 
  ``` sql
 SELECT type,
@@ -474,6 +417,8 @@ ROUND(AVG(days_logged)) AS average_days_logged,
 FROM `project-1-396413.Fitbit.days_logged`
 GROUP BY type
 ```
+Output:
+
 |type|average_days_logged|
 |----|-------------------|
 |Sleep Log|17.0               |
