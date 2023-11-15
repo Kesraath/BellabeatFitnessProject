@@ -491,7 +491,7 @@ ________
 
 To learn more about the habits of users in a visual way by comparing how the amount of time in bed relates to the amount of sleep one has.
 
-![alt text](https://github.com/Kesraath/BellabeatFitnessProject/blob/BellabeatProjectFiles/TotalSleep_vs_TotalTimeInBed.pngraw=true)
+![alt text](https://github.com/Kesraath/BellabeatFitnessProject/blob/BellabeatProjectFiles/TotalSleep_vs_TotalTimeInBed.png?raw=true)
 
 We can see there is a linear correlation between the amount of time in bed and the amount of sleep one has. This suggests that users who are in bed longer sleep more. 
 A notification to get in bed earlier could be helpful here.
