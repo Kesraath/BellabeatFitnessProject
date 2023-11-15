@@ -30,6 +30,7 @@ Fitness Tracking Data used for this project includes:
 
 "dailySteps_merged.csv" contains the daily amount of steps and the day the activity was logged by a user (data also found in "dailyActicity_merged.csv")
 
+All files used and displayed can be found here: [Project Files](https://github.com/Kesraath/BellabeatFitnessProject/tree/BellabeatProjectFiles)
 ### Tools
 
 - Google Sheets - Used to link to bigquery 
