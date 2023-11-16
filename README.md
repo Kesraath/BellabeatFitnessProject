@@ -214,7 +214,7 @@ The query below is a bit of a complicated mess, it calculates the Minimum, 1st Q
 This likely could have been done with the following code in R
 
 ``` R
-x <- read.csv("dailyActivity_merged.csv"
+x <- read.csv("dailyActivity_merged.csv")
 summary(x)
 ```
 However, this is the SQL code below to find stats and put them in a readable table format, using the same method as earlier using UNION ALL and labeling each corresponding 'stat' row with a string.
